@@ -29,6 +29,16 @@ npm install
 bower install
 ```
 
+## Démarrer le serveur mongo
+
+Pour démarrer le serveur mongo, il suffit de faire un 
+
+'''
+mongod --dbpath ./data
+'''
+
+là où vous voulez. Assurez vous qu'il démarre bien sur le port localhost:27017
+
 ## Démarrer l'application
 
 Pour démarrer l'application, exécutez la commande suivante depuis la racine du projet.
@@ -37,4 +47,3 @@ node server
 ```
 
 L'application est désormais accesssible à l'url **http://localhost:3000/**.
-
