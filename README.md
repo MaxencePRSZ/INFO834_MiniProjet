@@ -33,9 +33,9 @@ bower install
 
 Pour démarrer le serveur mongo, il suffit de faire un 
 
-'''
+```
 mongod --dbpath ./data
-'''
+```
 
 là où vous voulez. Assurez vous qu'il démarre bien sur le port **http://localhost:27017/**.
 
