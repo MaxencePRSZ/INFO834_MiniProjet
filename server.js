@@ -3,6 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var mongoose = require('mongoose')
+var Models = require('./model')
 var i;
 
 /**
@@ -31,8 +32,6 @@ var typingUsers = [];
 var db = 'mongodb://localhost:27017/Miniproj';
 mongoose.connect(db);
 
-var Schema = mongoose.Schema;
-var Message = mongoose.model("users", new Schema({User : String, Message : String}));
 
 io.on('connection', function (socket) {
 
@@ -129,8 +128,9 @@ io.on('connection', function (socket) {
     // On ajoute le username au message et on émet l'événement
     message.username = loggedUser.username;
 
-    var msg = new Message({User : message.username, Message : message.text})
-    msg.save(function (err) {
+    //Envoie du message sur la BDD Mongo
+    var newMessage = Models.Message({User : message.username, Message : message.text});
+    newMessage.save(function (err) {
       if (err) return handleError(err);
       // saved!
     });
