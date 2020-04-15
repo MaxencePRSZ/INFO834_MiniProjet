@@ -1,3 +1,12 @@
+# A destination des Enseignants
+
+Ce que nous avons fait :
+  - Récupération de chaque messages sous forme : {User : "", Message : ""} dans une bdd mongo
+  - Requête pour savoir le nombre de messages envoyés par un utilisateur et ajout dans la page web (Le petit nombre à coté du nom utilisateur
+  - Réécriture de certaines parties du code
+
+
+
 # Socket.io : Chat
 
 Cette application reprend les sources du tutoriel présent sur le blog [bini.io](http://blog.bini.io) :
@@ -7,14 +16,6 @@ Cette application reprend les sources du tutoriel présent sur le blog [bini.io]
 * [Partie 3](http://blog.bini.io/developper-un-chat-avec-socket-io-partie-3/)
 
 Ce tutoriel est lui même une adaptation du [tutoriel officiel](http://socket.io/get-started/chat/) de socket.io.
-
-Cette version ajoute les fonctionnalités suivantes par rapport à la version du tutoriel officiel :
-
-* Support des noms d'utilisateurs
-* Affichage d'un message lors de la connexion/déconnexion d'un utilisateur
-* Affichage de la liste des utilisateurs connectés
-* Conservation d'un historique des messages
-* Affichage du texte "typing" à côté du nom des utilisateurs en train de saisir un message
 
 ## Installation
 
