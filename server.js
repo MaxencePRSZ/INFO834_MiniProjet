@@ -44,6 +44,8 @@ io.on('connection', function (socket) {
    * Emission d'un événement "user-login" pour chaque utilisateur connecté
    */
   for (i = 0; i < users.length; i++) {
+    console.log("ikljuhsgfisdflsdfh ")
+    console.log(users[i].nbMessages)
     socket.emit('user-login', users[i]);
   }
 
@@ -100,22 +102,30 @@ io.on('connection', function (socket) {
     if (user !== undefined && userIndex === -1) { // S'il est bien nouveau
       // Sauvegarde de l'utilisateur et ajout à la liste des connectés
       loggedUser = user;
-      users.push(loggedUser);
-      // Envoi et sauvegarde des messages de service
-      var userServiceMessage = {
-        text: 'You logged in as "' + loggedUser.username + '"',
-        type: 'login'
-      };
-      var broadcastedServiceMessage = {
-        text: 'User "' + loggedUser.username + '" logged in',
-        type: 'login'
-      };
-      socket.emit('service-message', userServiceMessage);
-      socket.broadcast.emit('service-message', broadcastedServiceMessage);
-      messages.push(broadcastedServiceMessage);
-      // Emission de 'user-login' et appel du callback
-      io.emit('user-login', loggedUser);
-      callback(true);
+      loggedUser.nbMessages = 0;
+
+      //Recupération du nombre de message de l'utilisateur
+      Models.Message.aggregate([{$match : {User : loggedUser.username}},{$sortByCount:"$User"}],function(err,result) {
+        if (err) throw err;
+
+        loggedUser.nbMessages = result[0].count
+        users.push(loggedUser);
+        // Envoi et sauvegarde des messages de service
+        var userServiceMessage = {
+          text: 'You logged in as "' + loggedUser.username + '"',
+          type: 'login'
+        };
+        var broadcastedServiceMessage = {
+          text: 'User "' + loggedUser.username + '" logged in',
+          type: 'login'
+        };
+        socket.emit('service-message', userServiceMessage);
+        socket.broadcast.emit('service-message', broadcastedServiceMessage);
+        messages.push(broadcastedServiceMessage);
+        // Emission de 'user-login' et appel du callback
+        io.emit('user-login', loggedUser);
+        callback(true);
+      });
     } else {
       callback(false);
     }
