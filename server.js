@@ -44,8 +44,6 @@ io.on('connection', function (socket) {
    * Emission d'un événement "user-login" pour chaque utilisateur connecté
    */
   for (i = 0; i < users.length; i++) {
-    console.log("ikljuhsgfisdflsdfh ")
-    console.log(users[i].nbMessages)
     socket.emit('user-login', users[i]);
   }
 
