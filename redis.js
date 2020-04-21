@@ -1,9 +1,7 @@
 var redis = require('redis');
 
-
-
 var client = redis.createClient(); //creates a new client (utiliser var client = redis.createClient(port, host); si ports et host différents de 127.0.0.1 et 6379)
-var connected_users = [];
+client.del("users")
 
 
 client.on('connect', function() {
@@ -23,25 +21,16 @@ function remove_connected_user(username){
 }
 
 
-
-
 function get_connected_users(fn){
     client.smembers('users', function(err, reply) {
+        // console.log(reply)
         fn(reply);
     })
 }
 
 
-
-add_connected_user('evan');
-add_connected_user('maxence');
-
-
-
-users = []
-get_connected_users(function (list){
-    users = list;
-})
-console.log(users)
-
-
+module.exports = {
+    add_connected_user : add_connected_user,
+    remove_connected_user : remove_connected_user,
+    get_connected_users : get_connected_users
+}

@@ -5,16 +5,13 @@ var io = require('socket.io')(http);
 var mongoose = require('mongoose')
 var Models = require('./model')
 var i;
+const redisFuncs = require('./redis');
 
 /**
  * Gestion des requêtes HTTP des utilisateurs en leur renvoyant les fichiers du dossier 'public'
  */
 app.use('/', express.static(__dirname + '/public'));
 
-/**
- * Liste des utilisateurs connectés
- */
-var users = [];
 
 /**
  * Historique des messages
@@ -43,9 +40,12 @@ io.on('connection', function (socket) {
   /**
    * Emission d'un événement "user-login" pour chaque utilisateur connecté
    */
-  for (i = 0; i < users.length; i++) {
-    socket.emit('user-login', users[i]);
-  }
+  redisFuncs.get_connected_users(function (users_list){
+    for (i = 0; i < users_list.length; i++) {
+      socket.emit('user-login', users_list[i]);
+    }
+  })    
+
 
   /** 
    * Emission d'un événement "chat-message" pour chaque message de l'historique
@@ -69,11 +69,10 @@ io.on('connection', function (socket) {
         type: 'logout'
       };
       socket.broadcast.emit('service-message', serviceMessage);
-      // Suppression de la liste des connectés
-      var userIndex = users.indexOf(loggedUser);
-      if (userIndex !== -1) {
-        users.splice(userIndex, 1);
-      }
+
+      // Suppression de la liste des connectés (dans Redis)
+      redisFuncs.remove_connected_user(loggedUser.username);
+
       // Ajout du message à l'historique
       messages.push(serviceMessage);
       // Emission d'un 'user-logout' contenant le user
@@ -92,22 +91,29 @@ io.on('connection', function (socket) {
   socket.on('user-login', function (user, callback) {
     // Vérification que l'utilisateur n'existe pas
     var userIndex = -1;
-    for (i = 0; i < users.length; i++) {
-      if (users[i].username === user.username) {
-        userIndex = i;
+
+    redisFuncs.get_connected_users(function (users_list){
+      for (i = 0; i < users_list.length; i++) {
+        if (users_list[i] === user) {
+          userIndex = i;
+        }
       }
-    }
+    })    
     if (user !== undefined && userIndex === -1) { // S'il est bien nouveau
       // Sauvegarde de l'utilisateur et ajout à la liste des connectés
       loggedUser = user;
       loggedUser.nbMessages = 0;
+
 
       //Recupération du nombre de message de l'utilisateur
       Models.Message.aggregate([{$match : {User : loggedUser.username}},{$sortByCount:"$User"}],function(err,result) {
         if (err) throw err;
         if (result[0] !== undefined)
           loggedUser.nbMessages = result[0].count
-        users.push(loggedUser);
+
+        //Ajoute l'utilisateur à la base de donnée Redis (utilisateurs connectés)
+        redisFuncs.add_connected_user(loggedUser.username);
+
         // Envoi et sauvegarde des messages de service
         var userServiceMessage = {
           text: 'You logged in as "' + loggedUser.username + '"',
@@ -120,8 +126,9 @@ io.on('connection', function (socket) {
         socket.emit('service-message', userServiceMessage);
         socket.broadcast.emit('service-message', broadcastedServiceMessage);
         messages.push(broadcastedServiceMessage);
-        // Emission de 'user-login' et appel du callback
+
         io.emit('user-login', loggedUser);
+        // appel du callback
         callback(true);
       });
     } else {
