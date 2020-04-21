@@ -24,6 +24,11 @@ var messages = [];
 var typingUsers = [];
 
 /**
+ * Utilisateurs connectés
+ */
+var connected_users = [];
+
+/**
  * Liste des salons
  */
 var listSalon = []
@@ -41,11 +46,6 @@ io.on('connection', function (socket) {
    * Utilisateur connecté à la socket
    */
   var loggedUser;
-
-  /**
-   * Utilisateurs connectés
-   */
-  var connected_users = [];
 
   /**
    * Emission d'un événement "user-login" pour chaque utilisateur connecté
@@ -117,17 +117,16 @@ io.on('connection', function (socket) {
       loggedUser.nbMessages = 0;
 
 
+      //Ajoute l'utilisateur à la liste des utilisateurs connectés
+      connected_users.push(loggedUser);
+      //Ajoute l'utilisateur à la base de donnée Redis (utilisateurs connectés)
+      redisFuncs.add_connected_user(loggedUser.username);
+
       //Recupération du nombre de message de l'utilisateur
       Models.Message.aggregate([{ $match: { User: loggedUser.username } }, { $sortByCount: "$User" }], function (err, result) {
         if (err) throw err;
         if (result[0] !== undefined)
           loggedUser.nbMessages = result[0].count
-
-
-        //Ajoute l'utilisateur à la liste des utilisateurs connectés
-        connected_users.push(loggedUser);
-        //Ajoute l'utilisateur à la base de donnée Redis (utilisateurs connectés)
-        redisFuncs.add_connected_user(loggedUser.username);
 
         // Envoi et sauvegarde des messages de service
         var userServiceMessage = {
@@ -141,11 +140,11 @@ io.on('connection', function (socket) {
         socket.emit('service-message', userServiceMessage);
         socket.broadcast.emit('service-message', broadcastedServiceMessage);
         messages.push(broadcastedServiceMessage);
-
         io.emit('user-login', loggedUser);
         // appel du callback
         callback(true);
       });
+
     } else {
       callback(false);
     }
@@ -222,4 +221,6 @@ function getAllMessagesFromUser(username) {
   })
 }
 
-function getAllUsers()
+function getAllUsers() {
+  return null;
+}
