@@ -5,6 +5,18 @@ var i;
 
 /*** Fonctions utiles ***/
 
+
+
+/**
+ * Incrémentation de 1 du dernier nombre d'un string (ex : 'evan 13' -> 'evan 14')
+ */
+function increment_last(v) {
+  return v.replace(/[0-9]+(?!.*[0-9])/, function(match) {
+      return parseInt(match, 10)+1;
+  });
+}
+
+
 /**
  * Scroll vers le bas de page si l'utilisateur n'est pas remonté pour lire d'anciens messages
  */
@@ -70,7 +82,7 @@ socket.on('service-message', function (message) {
  * Connexion d'un nouvel utilisateur
  */
 socket.on('user-login', function (user) {
-  $('#users').append($('<li class="' + user.username + ' new">').html(user.username + '      ' + user.nbMessages + '<span class="typing">typing</span>'));
+  $('#users').append($('<li class="' + user.username + ' new">').html(user.username + '<span class="typing">typing</span>'));
   setTimeout(function () {
     $('#users li.new').removeClass('new');
   }, 1000);

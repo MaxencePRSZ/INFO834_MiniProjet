@@ -105,8 +105,8 @@ io.on('connection', function (socket) {
       //Recupération du nombre de message de l'utilisateur
       Models.Message.aggregate([{$match : {User : loggedUser.username}},{$sortByCount:"$User"}],function(err,result) {
         if (err) throw err;
-
-        loggedUser.nbMessages = result[0].count
+        if (result[0] !== undefined)
+          loggedUser.nbMessages = result[0].count
         users.push(loggedUser);
         // Envoi et sauvegarde des messages de service
         var userServiceMessage = {
@@ -136,8 +136,13 @@ io.on('connection', function (socket) {
     // On ajoute le username au message et on émet l'événement
     message.username = loggedUser.username;
 
-    //Envoie du message sur la BDD Mongo
+    //Envoi du message sur la BDD Mongo
     var newMessage = Models.Message({User : message.username, Message : message.text});
+    
+    //Incrémentation du nombre de messages de l'user connecté (qui a envoyé le message)
+    loggedUser.nbMessages++
+    console.log(loggedUser.username + ' : ' + loggedUser.nbMessages + ' messages')
+
     newMessage.save(function (err) {
       if (err) return handleError(err);
       // saved!
