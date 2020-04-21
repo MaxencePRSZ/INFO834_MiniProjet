@@ -122,7 +122,6 @@ io.on('connection', function (socket) {
             //Ajoute l'utilisateur à la base de donnée Redis (utilisateurs connectés)
             redisFuncs.add_connected_user(loggedUser.username);
 
-
             //Recupération du nombre de message de l'utilisateur
             Models.Message.aggregate([{ $match: { User: loggedUser.username } }, { $sortByCount: "$User" }], function (err, result) {
                 if (err) throw err;
@@ -141,11 +140,11 @@ io.on('connection', function (socket) {
                 socket.emit('service-message', userServiceMessage);
                 socket.broadcast.emit('service-message', broadcastedServiceMessage);
                 messages.push(broadcastedServiceMessage);
+                io.emit('user-login', loggedUser);
+                // appel du callback
+                callback(true);
             });
 
-            io.emit('user-login', loggedUser);
-            // appel du callback
-            callback(true);
         } else {
             callback(false);
         }
@@ -212,3 +211,16 @@ io.on('connection', function (socket) {
 http.listen(3000, function () {
     console.log('Server is listening on *:3000');
 });
+
+
+
+function getAllMessagesFromUser(username) {
+    // Pour avoir le nombre de message total (toutes rooms confondues) d'un utilisateur
+    Models.Message.aggregate([{ $match: { User: username } }, { $sortByCount: "$User" }], function (err, result) {
+        console.log(result);
+    })
+}
+
+function getAllUsers() {
+    return null;
+}
