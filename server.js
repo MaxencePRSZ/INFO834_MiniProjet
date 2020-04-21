@@ -38,13 +38,17 @@ io.on('connection', function (socket) {
   var loggedUser;
 
   /**
+   * Utilisateurs connectés
+   */
+  var connected_users = [];
+
+  /**
    * Emission d'un événement "user-login" pour chaque utilisateur connecté
    */
-  redisFuncs.get_connected_users(function (users_list){
-    for (i = 0; i < users_list.length; i++) {
-      socket.emit('user-login', users_list[i]);
-    }
-  })    
+  
+  for (i = 0; i < connected_users.length; i++) {
+      socket.emit('user-login', connected_users[i]);
+  }  
 
 
   /** 
@@ -72,7 +76,11 @@ io.on('connection', function (socket) {
 
       // Suppression de la liste des connectés (dans Redis)
       redisFuncs.remove_connected_user(loggedUser.username);
-
+      // Suppression de la liste des connectés 
+      var userIndex = connected_users.indexOf(loggedUser);
+      if (userIndex !== -1) {
+        connected_users.splice(userIndex, 1);
+      }
       // Ajout du message à l'historique
       messages.push(serviceMessage);
       // Emission d'un 'user-logout' contenant le user
@@ -89,16 +97,15 @@ io.on('connection', function (socket) {
    * Connexion d'un utilisateur via le formulaire :
    */
   socket.on('user-login', function (user, callback) {
+
     // Vérification que l'utilisateur n'existe pas
     var userIndex = -1;
-
-    redisFuncs.get_connected_users(function (users_list){
-      for (i = 0; i < users_list.length; i++) {
-        if (users_list[i] === user) {
-          userIndex = i;
-        }
+    for (i = 0; i < connected_users.length; i++) {
+      if (connected_users[i].username === user.username) {
+        userIndex = i;
       }
-    })    
+    }   
+      
     if (user !== undefined && userIndex === -1) { // S'il est bien nouveau
       // Sauvegarde de l'utilisateur et ajout à la liste des connectés
       loggedUser = user;
@@ -111,6 +118,9 @@ io.on('connection', function (socket) {
         if (result[0] !== undefined)
           loggedUser.nbMessages = result[0].count
 
+
+        //Ajoute l'utilisateur à la liste des utilisateurs connectés
+        connected_users.push(loggedUser);
         //Ajoute l'utilisateur à la base de donnée Redis (utilisateurs connectés)
         redisFuncs.add_connected_user(loggedUser.username);
 
