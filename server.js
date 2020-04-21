@@ -143,24 +143,27 @@ io.on('connection', function (socket) {
     // On ajoute le username au message et on émet l'événement
     message.username = loggedUser.username;
 
-    //Envoi du message sur la BDD Mongo
+    // Creation du message Mongo
     var newMessage = Models.Message({User : message.username, Message : message.text});
     
-    //Incrémentation du nombre de messages de l'user connecté (qui a envoyé le message)
-    loggedUser.nbMessages++
-    console.log(loggedUser.username + ' : ' + loggedUser.nbMessages + ' messages')
-
+    // Sauvegarde du message dans mongo
     newMessage.save(function (err) {
       if (err) return handleError(err);
-      // saved!
+      // Message sauvegardé
+      // Mis à jour du nombre de message
+      Models.Message.aggregate([{$match : {User : message.username}},{$sortByCount:"$User"}],function(err,result) {
+        message.nbMessage = 0 
+        if (result[0] !== undefined)
+          message.nbMessage = result[0].count
+    
+        io.emit('chat-message', message);
+        // Sauvegarde du message
+        messages.push(message);
+        if (messages.length > 150) {
+          messages.splice(0, 1);
+        }
+      });
     });
-
-    io.emit('chat-message', message);
-    // Sauvegarde du message
-    messages.push(message);
-    if (messages.length > 150) {
-      messages.splice(0, 1);
-    }
   });
 
   /**
