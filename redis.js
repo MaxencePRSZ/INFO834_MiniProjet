@@ -41,7 +41,7 @@ add_connected_user('maxence');
 users = []
 get_connected_users(function (list){
     users = list;
+    console.log(users)
 })
-console.log(users)
 
 

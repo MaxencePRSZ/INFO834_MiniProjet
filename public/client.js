@@ -66,7 +66,8 @@ $('#chat form').submit(function (e) {
  * Réception d'un message
  */
 socket.on('chat-message', function (message) {
-  $('#messages').append($('<li>').html('<span class="username">' + message.username + '</span> ' + message.text));
+  $('#messages').append($('<li>').html('<span class="username">' + message.username + '</span> ' + message.text ));
+  $('.' + message.username + ' ' + '.nbMessage').html(message.nbMessage);
   scrollToBottom();
 });
 
@@ -82,7 +83,7 @@ socket.on('service-message', function (message) {
  * Connexion d'un nouvel utilisateur
  */
 socket.on('user-login', function (user) {
-  $('#users').append($('<li class="' + user.username + ' new">').html(user.username + '      ' + user.nbMessages + '<span class="typing">typing</span>'));
+  $('#users').append($('<li class="' + user.username + ' new">').html(user.username + '      ' + '<span class="nbMessage">' + user.nbMessages + '</span>'));
   setTimeout(function () {
     $('#users li.new').removeClass('new');
   }, 1000);
