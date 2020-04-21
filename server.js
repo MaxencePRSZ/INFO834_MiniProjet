@@ -29,6 +29,11 @@ var typingUsers = [];
 var connected_users = [];
 
 /**
+ * Liste des salons
+ */
+var listSalon = []
+
+/**
  * Connection à mongo
  */
 var db = 'mongodb://localhost:27017/Miniproj';
