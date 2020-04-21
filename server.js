@@ -50,10 +50,10 @@ io.on('connection', function (socket) {
   /**
    * Emission d'un événement "user-login" pour chaque utilisateur connecté
    */
-  
+
   for (i = 0; i < connected_users.length; i++) {
-      socket.emit('user-login', connected_users[i]);
-  }  
+    socket.emit('user-login', connected_users[i]);
+  }
 
 
   /** 
@@ -109,8 +109,8 @@ io.on('connection', function (socket) {
       if (connected_users[i].username === user.username) {
         userIndex = i;
       }
-    }   
-      
+    }
+
     if (user !== undefined && userIndex === -1) { // S'il est bien nouveau
       // Sauvegarde de l'utilisateur et ajout à la liste des connectés
       loggedUser = user;
@@ -118,7 +118,7 @@ io.on('connection', function (socket) {
 
 
       //Recupération du nombre de message de l'utilisateur
-      Models.Message.aggregate([{$match : {User : loggedUser.username}},{$sortByCount:"$User"}],function(err,result) {
+      Models.Message.aggregate([{ $match: { User: loggedUser.username } }, { $sortByCount: "$User" }], function (err, result) {
         if (err) throw err;
         if (result[0] !== undefined)
           loggedUser.nbMessages = result[0].count
@@ -159,18 +159,18 @@ io.on('connection', function (socket) {
     message.username = loggedUser.username;
 
     // Creation du message Mongo
-    var newMessage = Models.Message({User : message.username, Message : message.text});
-    
+    var newMessage = Models.Message({ User: message.username, Message: message.text });
+
     // Sauvegarde du message dans mongo
     newMessage.save(function (err) {
       if (err) return handleError(err);
       // Message sauvegardé
       // Mis à jour du nombre de message
-      Models.Message.aggregate([{$match : {User : message.username}},{$sortByCount:"$User"}],function(err,result) {
-        message.nbMessage = 0 
+      Models.Message.aggregate([{ $match: { User: message.username } }, { $sortByCount: "$User" }], function (err, result) {
+        message.nbMessage = 0
         if (result[0] !== undefined)
           message.nbMessage = result[0].count
-    
+
         io.emit('chat-message', message);
         // Sauvegarde du message
         messages.push(message);
@@ -212,3 +212,14 @@ io.on('connection', function (socket) {
 http.listen(3000, function () {
   console.log('Server is listening on *:3000');
 });
+
+
+
+function getAllMessagesFromUser(username) {
+  // Pour avoir le nombre de message total (toutes rooms confondues) d'un utilisateur
+  Models.Message.aggregate([{ $match: { User: username } }, { $sortByCount: "$User" }], function (err, result) {
+    console.log(result);
+  })
+}
+
+function getAllUsers()
