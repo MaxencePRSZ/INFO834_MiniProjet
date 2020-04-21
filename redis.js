@@ -33,19 +33,15 @@ function get_connected_users(fn){
 
 
 
-users = []
-get_connected_users("users")
-
-
 add_connected_user('evan');
-zz= get_connected_users()
-console.log(zz);
-
-
-
 add_connected_user('maxence');
-console.log(get_connected_users());
 
 
-remove_connected_user('evan');
-console.log(get_connected_users());
+
+users = []
+get_connected_users(function (list){
+    users = list;
+})
+console.log(users)
+
+
