@@ -222,5 +222,7 @@ function getAllMessagesFromUser(username) {
 }
 
 function getAllUsers() {
-    return null;
+  Models.Message.aggregate([{ $group: { _id : "$User" } }], function (err, result) {
+    console.log(result);
+  })
 }
