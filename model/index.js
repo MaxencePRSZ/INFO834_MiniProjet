@@ -31,9 +31,10 @@ function getAllMessagesFromUser(username) {
 
 //Récupération du dernier salon, c'est à dire le salon avec l'ID la plus grande
 function getLastSalon(func){
+    ret = 0;
     Message.find({}, { Salon : 1 }).sort({Salon : -1}).limit(1).exec( function(err, result) {
         if (err) throw err;
-        if (result[0] !== undefined)
+        if (result[0] !== undefined && result[0] !== NaN)
             ret = result[0].Salon;
         func(ret);
    });

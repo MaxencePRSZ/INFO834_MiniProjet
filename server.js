@@ -2,9 +2,12 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+
+//Utilisation de Mongo et de fonctions associées
 var mongoose = require('mongoose')
 var Models = require('./model')
-var i;
+
+//Utilisation des fonctions pour Redis
 const redisFuncs = require('./redis');
 
 /**
@@ -13,6 +16,7 @@ const redisFuncs = require('./redis');
 app.use('/', express.static(__dirname + '/public'));
 
 
+var i;
 /**
  * Historique des messages
  */
@@ -36,9 +40,12 @@ var currentSalon = 0
 /**
  * Connection à mongo
  */
-var db = 'mongodb://localhost:27017/Miniproj';
-mongoose.connect(db);
+//Utilisation du ReplicaSet pour assurer la tolérance aux pannes
+let db = 'mongodb://localhost:27018,localhost:27019,localhost:27020/Miniproj?replicaSet=rs0'
 
+//Utilisation d'une BDD Mongo simple pour le développement
+// var db = 'mongodb://localhost:27017/Miniproj';
+mongoose.connect(db);
 
 io.on('connection', function (socket) {
 
