@@ -75,8 +75,8 @@ rs.status()
 ## Démarrer l'application
 
 Pour démarrer l'application, assurez-vous :
-  - d'avoir bien récupérer les sources du projet
-  - d'avoir démarrer les serveurs Mongo en ReplicaSet (et qu'ils soient bien connectés entre eux)
+  - d'avoir bien récupéré les sources du projet
+  - d'avoir démarré les serveurs Mongo en ReplicaSet (et qu'ils soient bien connectés entre eux)
   - d'avoir démarré votre serveur Redis (qui écoute sur le port 6379 par défaut, sinon voir redis.js)
 
 Exécutez la commande suivante depuis la racine du projet.
