@@ -15,7 +15,7 @@ Ce que nous avons fait :
   - Réécriture de certaines parties du code de base
   
 
-# Socket.io : Chat
+# Notre serveur de chat
 
 Cette application reprend les sources du tutoriel présent sur le blog [bini.io](http://blog.bini.io) :
 
@@ -40,7 +40,7 @@ bower install
 
 ## Démarrer le serveur Mongo - ReplicaSet
 
-Pour démarrer les différents serveurs Mongo, il suffit de lancer les commandes suivantes :
+Pour démarrer les différents serveurs Mongo, il suffit de lancer les commandes suivantes (en s'assurant au préalable que les différents dossiers de stockages existent) :
 ```
 mongod --replSet rs0 --port 27018 --dbpath "MiniProjet\data\R0S1"
 mongod --replSet rs0 --port 27019 --dbpath "MiniProjet\data\R0S2"
@@ -70,12 +70,16 @@ Finalement, on vérifie que tout marche avec la commande suivante :
 rs.status()
 ```
 
-
 ## Démarrer l'application
 
-Pour démarrer l'application, exécutez la commande suivante depuis la racine du projet.
+Pour démarrer l'application, assurez-vous :
+  - d'avoir bien récupérer les sources du projet
+  - d'avoir démarrer les serveurs Mongo en ReplicaSet (et qu'ils soient bien connectés entre eux)
+  - d'avoir démarré votre serveur Redis (qui écoute sur le port 6379 par défaut, sinon voir redis.js)
+
+Exécutez la commande suivante depuis la racine du projet.
 ```
 node server
 ```
 
-L'application est désormais accesssible à l'url **http://localhost:3000/**.
+L'application est désormais accesssible à l'url **http://localhost:3000/**. Faites-vous plaisir, vous pouvez maintenant discuter avec vos amis en toute liberté !
