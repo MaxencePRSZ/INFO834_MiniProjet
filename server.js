@@ -123,9 +123,9 @@ io.on('connection', function (socket) {
       redisFuncs.add_connected_user(loggedUser.username);
 
       //Recupération du nombre de message de l'utilisateur
-      Models.getUsersMessageNumbers(loggedUser.username, function(result){
-        loggedUser.nbMessages = result;        
-        
+      Models.getUsersMessageNumbers(loggedUser.username, function (result) {
+        loggedUser.nbMessages = result;
+
         // Envoi et sauvegarde des messages de service
         var userServiceMessage = {
           text: 'You logged in as "' + loggedUser.username + '"',
@@ -137,12 +137,12 @@ io.on('connection', function (socket) {
         };
         socket.emit('service-message', userServiceMessage);
         socket.broadcast.emit('service-message', broadcastedServiceMessage);
-      messages.push(broadcastedServiceMessage);
-      io.emit('user-login', loggedUser);
-      // appel du callback
-      callback(true);
-      
-    });
+        messages.push(broadcastedServiceMessage);
+        io.emit('user-login', loggedUser);
+        // appel du callback
+        callback(true);
+
+      });
     } else {
       callback(false);
     }
@@ -163,7 +163,7 @@ io.on('connection', function (socket) {
       if (err) return handleError(err);
       // Message sauvegardé
       // Mis à jour du nombre de message
-      Models.getUsersMessageNumbers(message.username, function(result){
+      Models.getUsersMessageNumbers(message.username, function (result) {
         message.nbMessage = result
 
         io.emit('chat-message', message);
@@ -209,16 +209,3 @@ http.listen(3000, function () {
 });
 
 
-
-function getAllMessagesFromUser(username) {
-  // Pour avoir le nombre de message total (toutes rooms confondues) d'un utilisateur
-  Models.Message.aggregate([{ $match: { User: username } }, { $sortByCount: "$User" }], function (err, result) {
-    console.log(result);
-  })
-}
-
-function getAllUsers() {
-  Models.Message.aggregate([{ $group: { _id: "$User" } }], function (err, result) {
-    console.log(result);
-  })
-}
