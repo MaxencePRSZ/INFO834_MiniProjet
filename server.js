@@ -31,7 +31,7 @@ var connected_users = [];
 /**
  * Liste des salons
  */
-var listSalon = []
+var currentSalon = 0
 
 /**
  * Connection à mongo
@@ -95,6 +95,7 @@ io.on('connection', function (socket) {
       if (typingUserIndex !== -1) {
         typingUsers.splice(typingUserIndex, 1);
       }
+
     }
   });
 
@@ -102,7 +103,11 @@ io.on('connection', function (socket) {
    * Connexion d'un utilisateur via le formulaire :
    */
   socket.on('user-login', function (user, callback) {
-
+    // Si premier utilisateur à se connecter, on change de salon
+    if (connected_users.length == 0)
+      Models.getLastSalon(function(ret){
+        currentSalon = Number(ret) + 1;
+      })
     // Vérification que l'utilisateur n'existe pas
     var userIndex = -1;
     for (i = 0; i < connected_users.length; i++) {
@@ -156,7 +161,7 @@ io.on('connection', function (socket) {
     message.username = loggedUser.username;
 
     // Creation du message Mongo
-    var newMessage = Models.Message({ User: message.username, Message: message.text });
+    var newMessage = Models.Message({ User: message.username, Message: message.text, Salon : currentSalon });
 
     // Sauvegarde du message dans mongo
     newMessage.save(function (err) {

@@ -28,10 +28,14 @@ function getAllMessagesFromUser(username) {
     })
 }
 
-function getLastSalon(){
-    Message.find({}, {Salon: 1, _id: 0}, function(err , result){
-        console.log(result)
-    });
+//Get last Salon
+function getLastSalon(func){
+    Message.find({}, { Salon : 1 }).sort({Salon : -1}).limit(1).exec( function(err, result) {
+        if (err) throw err;
+        if (result[0] !== undefined)
+            ret = result[0].Salon;
+        func(ret);
+   });
 }
 
 
@@ -46,6 +50,7 @@ function getAllUsers() {
 // Export Contact model
 module.exports = {
     Message: Message,
-    getUsersMessageNumbers: getUsersMessageNumbers
+    getUsersMessageNumbers: getUsersMessageNumbers,
+    getLastSalon : getLastSalon
 };
 
