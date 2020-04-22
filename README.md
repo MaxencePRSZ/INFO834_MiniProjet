@@ -1,13 +1,21 @@
 # A destination des Enseignants
 
 Ce que nous avons fait :
-  - Récupération de chaque messages sous forme : {User : "", Message : ""} dans une bdd mongo
-  - Requête pour savoir le nombre de messages envoyés par un utilisateur et ajout dans la page web (Le petit nombre à coté du nom utilisateur
-  - Réécriture de certaines parties du code
+  - Récupération de chaque messages sous forme : {User : "", Message : "", Salon : ""} dans une BDD mongo
+    (exemple : {User : "Evan", Message : "Bonjour !", Salon : "1"}
+  - Affichage du nombre de messages envoyés par un utilisateur dans l'interface de chat
+  - Stockage des messages (et de leur users et salons) dans Mongo
+  - Stockage en temps réel des utilisateurs connectés dans Redis (avec flush de la BDD au lancement du serveur)
+  - Utilisation du ReplicaSet pour palier aux pannes éventuelles
+  - Diverses fonctions relatives aux données des messages
+    - Affichage d'une conversation précédente entre des utilisateurs
+    - Récupération de tous les messages d'un utilisateur
+    - Récupération de tous les messages d'un utilisateur dans un salon spécifique
+    - Récupération de tous les utilisateurs qui ont particité à une discussion
+  - Réécriture de certaines parties du code de base
+  
 
-
-
-# Socket.io : Chat
+# Notre serveur de chat
 
 Cette application reprend les sources du tutoriel présent sur le blog [bini.io](http://blog.bini.io) :
 
@@ -30,21 +38,48 @@ npm install
 bower install
 ```
 
-## Démarrer le serveur mongo
+## Démarrer le serveur Mongo - ReplicaSet
 
-Pour démarrer le serveur mongo, il suffit de faire un 
-
+Pour démarrer les différents serveurs Mongo, il suffit de lancer les commandes suivantes (en s'assurant au préalable que les différents dossiers de stockages existent) :
 ```
-mongod --dbpath ./data
+mongod --replSet rs0 --port 27018 --dbpath "MiniProjet\data\R0S1"
+mongod --replSet rs0 --port 27019 --dbpath "MiniProjet\data\R0S2"
+mongod --replSet rs0 --port 27020 --dbpath "MiniProjet\data\R0S3"
+mongod --replSet rs0 --port 30000 --dbpath "MiniProjet\data\arb"
 ```
 
-là où vous voulez. Assurez vous qu'il démarre bien sur le port **http://localhost:27017/**.
+Après avoir démarrer les 3 premiers serveurs et l'arbitre, il faut maintenant spécifier le serveur Primary :
+```
+mongo --port 27018
+rs.initiate()
+```
+
+Ensuite, on va pouvoir ajouter les deux serveurs Secondary au ReplicaSet :
+```
+rs.add("localhost:27019")
+rs.add("localhost:27020")
+```
+
+On va pouvoir définir l'arbitre avec la commande suivante :
+```
+rs.addArb("localhost:30000")
+```
+
+Finalement, on vérifie que tout marche avec la commande suivante :
+```
+rs.status()
+```
 
 ## Démarrer l'application
 
-Pour démarrer l'application, exécutez la commande suivante depuis la racine du projet.
+Pour démarrer l'application, assurez-vous :
+  - d'avoir bien récupérer les sources du projet
+  - d'avoir démarrer les serveurs Mongo en ReplicaSet (et qu'ils soient bien connectés entre eux)
+  - d'avoir démarré votre serveur Redis (qui écoute sur le port 6379 par défaut, sinon voir redis.js)
+
+Exécutez la commande suivante depuis la racine du projet.
 ```
 node server
 ```
 
-L'application est désormais accesssible à l'url **http://localhost:3000/**.
+L'application est désormais accesssible à l'url **http://localhost:3000/**. Faites-vous plaisir, vous pouvez maintenant discuter avec vos amis en toute liberté !
