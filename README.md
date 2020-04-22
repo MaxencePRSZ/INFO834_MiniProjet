@@ -43,8 +43,20 @@ bower install
 Pour démarrer les différents serveurs Mongo, il suffit de lancer les commandes suivantes :
 
 ```
-mongod --dbpath ./data
+mongod --replSet rs0 --port 27018 --dbpath "MiniProjet\data\R0S1"
+mongod --replSet rs0 --port 27019 --dbpath "MiniProjet\data\R0S2"
+mongod --replSet rs0 --port 27020 --dbpath "MiniProjet\data\R0S3"
+mongod --replSet rs0 --port 30000 --dbpath "MiniProjet\data\arb"
 ```
+Après avoir démarrer les 3 premiers serveurs et l'arbitre, il faut maintenant spécifier "qui est qui", dans une autre console de client Mongo :
+
+```
+mongod --replSet rs0 --port 27018 --dbpath "MiniProjet\data\R0S1"
+mongod --replSet rs0 --port 27019 --dbpath "MiniProjet\data\R0S2"
+mongod --replSet rs0 --port 27020 --dbpath "MiniProjet\data\R0S3"
+mongod --replSet rs0 --port 30000 --dbpath "MiniProjet\data\arb"
+```
+
 
 là où vous voulez. Assurez vous qu'il démarre bien sur le port **http://localhost:27017/**.
 
