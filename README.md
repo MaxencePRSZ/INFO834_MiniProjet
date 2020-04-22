@@ -1,3 +1,5 @@
+Ce projet de serveur de chat a été réalisé dans le cadre du cours d'INFO834 "Bases de données distribuées" à Polytech Annecy, par Maxence Personnaz et Evan Dadure (https://github.com/evandadure).
+
 # A destination des Enseignants
 
 Ce que nous avons fait :
