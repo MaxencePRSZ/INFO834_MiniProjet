@@ -1,6 +1,8 @@
 var redis = require('redis');
 
 var client = redis.createClient(); //creates a new client (utiliser var client = redis.createClient(port, host); si ports et host différents de 127.0.0.1 et 6379)
+
+//On nettoie la base de données à chaque démarrage du serveur
 client.del("users")
 
 //Gestion des erreurs

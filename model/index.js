@@ -21,7 +21,7 @@ function getUsersMessageNumbers(username, func) {
     });
 }
 
-//Récupération de tous les messages d'un users spécifique
+//Récupération de tous les messages d'un user spécifique
 function getAllMessagesFromUser(username) {
     // Pour avoir le nombre de message total (toutes rooms confondues) d'un utilisateur
     Message.aggregate([{ $match: { User: username } }, { $sortByCount: "$User" }], function (err, result) {
